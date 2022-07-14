@@ -28,7 +28,8 @@ con <- dbConnect(RPostgres::Postgres(), dbname = db, host=host_db, port=db_port,
 tables <- dbListTables(con) 
 print(con)
 print(tables)
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, ((dd.trailing_2h_standard_deviation - dd.trailing_1h_standard_deviation) / dd.trailing_2h_standard_deviation) * 100.0, dd.delta_10min FROM dydx d, dydxd dd where d.id = dd.dydx_id'))
+#dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, ((dd.trailing_2h_standard_deviation - dd.trailing_1h_standard_deviation) / dd.trailing_2h_standard_deviation) * 100.0, dd.delta_10min FROM dydx d, dydxd dd where d.id = dd.dydx_id'))
+dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, (dd.trailing_2h_standard_deviation - dd.trailing_1h_standard_deviation) / dd.trailing_2h_standard_deviation, dd.delta_10min FROM dydx d, dydxd dd where d.id = dd.dydx_id'))
 
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
@@ -37,7 +38,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   dydxdf <- filter(dydxd,asset_pair==i)
   df <- data.frame("T2H1HDSTD"=as.numeric(dydxdf[[3]]),"D10M"=as.numeric(dydxdf[[4]]))
-  print(df)
+ # print(df)
 
   res <- GMM(
     df,
@@ -54,19 +55,19 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
   pr = predict(res, newdata = df)
 
   df$col3 <- pr 
-  print(df)
+#  print(df)
   colnames(df) <- c('T2H1HDSTD','D10M','Cluster')
 
   ggplot(df, aes(x=T2H1HDSTD,y=D10M)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
     #BTC
-    # xlim(-.10,.10) +
-    # ylim(-.10,.10) +
+    xlim(-1.0,1.0) +
+    ylim(-3.0,3.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
     scale_fill_simpsons() +
-     labs(y="", x="", title=i, caption="") +
+     labs(y="10 Min Future Perormance Delta", x="2 Hour vs 1 Hour Trailing Vol", title=i, caption="K-Means Gaussian Mixture Model") +
     theme(
       axis.title.x = element_text(color="#e3120b", size=12, face="bold", margin = margin(t = 10, r = 20, b = 0, l = 0)),
       axis.title.y = element_text(color="#e3120b", size=12, face="bold"),
