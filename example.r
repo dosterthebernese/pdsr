@@ -66,7 +66,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
     guides(alpha="none") +
     scale_color_simpsons() +
     scale_fill_simpsons() +
-     labs(y="", x="", title="tmp", caption="tmp") +
+     labs(y="", x="", title=i, caption="") +
     theme(
       axis.title.x = element_text(color="#e3120b", size=12, face="bold", margin = margin(t = 10, r = 20, b = 0, l = 0)),
       axis.title.y = element_text(color="#e3120b", size=12, face="bold"),
@@ -74,7 +74,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       )
 
 #  ggsave(sprintf("%s/%s-%s-%s-%s","clusterdb",i,dumb_hack_1,dumb_hack_2,"dydxmarkets-triple-negvdpv.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s","tmp.png"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s-%s",i,"g2d-t2ht1hd-f10md.png"), width=8, height=6, dpi=300,  units="in")
 
 }
 
