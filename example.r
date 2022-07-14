@@ -74,6 +74,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       )
 
 #  ggsave(sprintf("%s/%s-%s-%s-%s","clusterdb",i,dumb_hack_1,dumb_hack_2,"dydxmarkets-triple-negvdpv.svg"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s-%s",i,"g2d-t2ht1hd-f10md.svg"), width=8, height=6, dpi=300,  units="in")
   ggsave(sprintf("%s-%s",i,"g2d-t2ht1hd-f10md.png"), width=8, height=6, dpi=300,  units="in")
 
 }
