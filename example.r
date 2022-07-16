@@ -8,10 +8,10 @@ library(gtools)
 library(RPostgreSQL)
 library(DBI)
 
-# sudo apt-get install libpq-dev
-# sudo R
-# install.packages('RPostgreSQL')
-# install.packages('RPostgres')
+mainDir <- "."
+subDir <- "publish"
+
+ifelse(!dir.exists(file.path(mainDir, subDir)), dir.create(file.path(mainDir, subDir)), FALSE)
 
 db <- 'tradellama'  #provide the name of your db
 host_db <- 'localhost' #i.e. # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'  
