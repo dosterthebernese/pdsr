@@ -22,7 +22,8 @@ con <- dbConnect(RPostgres::Postgres(), dbname = db, host=host_db, port=db_port,
 tables <- dbListTables(con) 
 print(con)
 print(tables)
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_10min_standard_deviation - dd.trailing_5min_standard_deviation) / dd.trailing_10min_standard_deviation, dd.delta_10min FROM dydx d, dydxdmin dd where d.id = dd.dydx_id order by as_of'))
+#dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, ((dd.trailing_2h_standard_deviation - dd.trailing_1h_standard_deviation) / dd.trailing_2h_standard_deviation) * 100.0, dd.delta_10min FROM dydx d, dydxd dd where d.id = dd.dydx_id'))
+dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_2h_standard_deviation - dd.trailing_1h_standard_deviation) / dd.trailing_2h_standard_deviation, dd.delta_10min FROM dydx d, dydxd dd where d.id = dd.dydx_id order by as_of'))
 
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
@@ -37,7 +38,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
   caption_text = sprintf("%s %s %s", "KM GMM", min_as_of, max_as_of)
 #  caption_text = sprintf(%s %s %s, "K-Means Gaussian Mixture Model", min_as_of, max_as_of)
 
-  df <- data.frame("T10MIN5MINDSTD"=as.numeric(dydxdf[[4]]),"D10M"=as.numeric(dydxdf[[5]]))
+  df <- data.frame("T2H1HDSTD"=as.numeric(dydxdf[[4]]),"D10M"=as.numeric(dydxdf[[5]]))
 
   res <- GMM(
     df,
@@ -55,9 +56,9 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   df$col3 <- pr 
 #  print(df)
-  colnames(df) <- c('T10MIN5MINDSTD','D10M','Cluster')
+  colnames(df) <- c('T2H1HDSTD','D10M','Cluster')
 
-  ggplot(df, aes(x=T10MIN5MINDSTD,y=D10M)) +
+  ggplot(df, aes(x=T2H1HDSTD,y=D10M)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
     #BTC
     xlim(-2.0,2.0) +
@@ -66,7 +67,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
     guides(alpha="none") +
     scale_color_simpsons() +
     scale_fill_simpsons() +
-     labs(y="10 Min Future Perormance Delta", x="10 Min vs 5Min Trailing Vol", title=i, caption=caption_text) +
+     labs(y="10 Min Future Perormance Delta", x="2 Hour vs 1 Hour Trailing Vol", title=i, caption=caption_text) +
     theme(
       axis.title.x = element_text(color="#e3120b", size=12, face="bold", margin = margin(t = 10, r = 20, b = 0, l = 0)),
       axis.title.y = element_text(color="#e3120b", size=12, face="bold"),
@@ -74,12 +75,12 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       )
 
 #  ggsave(sprintf("%s/%s-%s-%s-%s","clusterdb",i,dumb_hack_1,dumb_hack_2,"dydxmarkets-triple-negvdpv.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-t10mint5mind-f10md.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-t10mint5mind-f10md.png"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-t2ht1hd-f10md.svg"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-t2ht1hd-f10md.png"), width=8, height=6, dpi=300,  units="in")
 
-  dfcsv <- data.frame("AsOf"=as.character(dydxdf[[3]]), "T10MIN5MINDSTD"=as.numeric(dydxdf[[4]]),"D10M"=as.numeric(dydxdf[[5]]))
+  dfcsv <- data.frame("AsOf"=as.character(dydxdf[[3]]), "T2H1HDSTD"=as.numeric(dydxdf[[4]]),"D10M"=as.numeric(dydxdf[[5]]))
 
-  write.csv(dfcsv,sprintf("%s/%s-%s","publish",i,"g2d-t10mint5mind-f10md.csv"), row.names = FALSE)
+  write.csv(dfcsv,sprintf("%s/%s-%s","publish",i,"g2d-t2ht1hd-f10md.csv"), row.names = FALSE)
 
 }
 
