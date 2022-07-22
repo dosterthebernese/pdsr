@@ -22,7 +22,7 @@ con <- dbConnect(RPostgres::Postgres(), dbname = db, host=host_db, port=db_port,
 tables <- dbListTables(con) 
 print(con)
 print(tables)
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_10min_standard_deviation - dd.trailing_5min_standard_deviation) / dd.trailing_10min_standard_deviation, dd.delta_10min FROM dydx d, dydxdmin dd where d.id = dd.dydx_id order by as_of'))
+dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta FROM dydx d, dydxd dd where d.id = dd.dydx_id order by as_of'))
 
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
@@ -60,8 +60,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
   ggplot(df, aes(x=T10MIN5MINDSTD,y=D10M)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
     #BTC
-    xlim(-2.0,2.0) +
-    ylim(-5.0,5.0) +
+    # xlim(-2.0,2.0) +
+    # ylim(-5.0,5.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
