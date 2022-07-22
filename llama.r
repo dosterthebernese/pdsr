@@ -62,9 +62,9 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   ggplot(df, aes(x=VOL,y=DEL)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
-    #BTC
-    # xlim(-2.0,2.0) +
-    # ylim(-5.0,5.0) +
+    #You will have to work on this
+    xlim(-2.0,2.0) +
+    ylim(-2.0,2.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
@@ -126,9 +126,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   ggplot(df, aes(x=VOL,y=DEL)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
-    #BTC
-    # xlim(-2.0,2.0) +
-    # ylim(-5.0,5.0) +
+    xlim(-2.0,2.0) +
+    ylim(-2.0,2.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
@@ -190,9 +189,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   ggplot(df, aes(x=VOL,y=DEL)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
-    #BTC
-    # xlim(-2.0,2.0) +
-    # ylim(-5.0,5.0) +
+    xlim(-2.0,2.0) +
+    ylim(-2.0,2.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
