@@ -18,6 +18,7 @@ install.packages("ClusterR")
 
 install.packages("RPostgreSQL")  
 
-install.packages('RPostgres')  
+install.packages("RPostgres")  
 
-install.packages('svglite')  
+install.packages("svglite")  
+
