@@ -14,9 +14,12 @@ subDir <- "publish"
 ifelse(!dir.exists(file.path(mainDir, subDir)), dir.create(file.path(mainDir, subDir)), FALSE)
 
 db <- 'tradellama'  #provide the name of your db
+#host_db <- '35.226.13.55' #i.e. # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'  
+# better to run local
 host_db <- 'localhost' #i.e. # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'  
 db_port <- '5432'  # or any other port specified by the DBA
 db_user <- 'postgres'  
+#db_password <- ''
 db_password <- 'Z3tonium'
 con <- dbConnect(RPostgres::Postgres(), dbname = db, host=host_db, port=db_port, user=db_user, password=db_password)  
 tables <- dbListTables(con) 
