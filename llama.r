@@ -28,7 +28,7 @@ print(tables)
 
 
 
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta FROM dydx d, dydxd dd where d.id = dd.dydx_id order by as_of'))
+dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta, d.index_price FROM dydx d, dydxd dd where d.id = dd.dydx_id order by as_of'))
 
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
@@ -87,8 +87,42 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   write.csv(dfcsv,sprintf("%s/%s-%s","publish",i,"g2d-vol-del.csv"), row.names = FALSE)
 
-}
 
+  dfts <- data.frame("AsOf"=as.POSIXct(dydxdf[[3]], format="%Y-%m-%dT%H:%M:%S"), "Price"=as.numeric(dydxdf[[6]]))
+
+  md <- filter(dydxd,asset_pair==i)
+
+  first_price = dfts$Price[1]
+  last_price = dfts$Price[nrow(md)]
+  interval_return = (last_price - first_price) / first_price
+
+  std = sd(dfts$Price)
+  mea = mean(dfts$Price)
+  vol = std / mea
+  interval_volatility = vol
+
+  caption_text = sprintf("%s %s", min_as_of, max_as_of)
+
+
+  ggplot(dfts, aes(x=AsOf,y=Price)) +
+    geom_line(size=1) +
+    theme_tufte() +
+    scale_color_simpsons() +
+    scale_fill_simpsons() +
+     labs(y="", x="", title=i, caption=caption_text) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank(),
+      axis.title.y = element_text(color="#e3120b", size=12, face="bold")
+      )
+
+  ggsave(sprintf("%s/%s-%s","publish",i,"ts.svg"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s-%s","publish",i,"ts.png"), width=8, height=2, dpi=300,  units="in")
+
+
+
+
+}
 
 
 
@@ -155,7 +189,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
 
 
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta FROM dydx d, dydxd dd where d.id = dd.dydx_id and dd.trailing_average > dd.trailing_halved_average order by as_of'))
+dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta, d.index_price FROM dydx d, dydxd dd where d.id = dd.dydx_id and dd.trailing_average > dd.trailing_halved_average order by as_of'))
 
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
@@ -212,6 +246,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
   dfcsv <- data.frame("AsOf"=as.character(dydxdf[[3]]), "VOL"=as.numeric(dydxdf[[4]]),"DEL"=as.numeric(dydxdf[[5]]))
 
   write.csv(dfcsv,sprintf("%s/%s-%s","publish",i,"g2d-vol-del-avg-down.csv"), row.names = FALSE)
+
+
 
 }
 
