@@ -8,9 +8,9 @@ library(gtools)
 library(RPostgreSQL)
 library(DBI)
 
-mainDir <- "."
-subDir <- "publish"
 
+mainDir <- "."
+subDir <- sprintf("%s", "publish")
 ifelse(!dir.exists(file.path(mainDir, subDir)), dir.create(file.path(mainDir, subDir)), FALSE)
 
 db <- 'tradellama'  #provide the name of your db
@@ -29,6 +29,7 @@ print(tables)
 
 gtedate = "\'2022-08-01 00:00:00 +00:00\'"
 ltdate = "\'2022-08-02 00:00:00 +00:00\'"
+
 
 qry_text = sprintf("SELECT d.asset_pair, dd.dydx_id, d.as_of, 
   (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, 
@@ -49,9 +50,22 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   dydxdf <- filter(dydxd,asset_pair==i)
   min_as_of = min(dydxd$as_of)
+  min_as_of_list = strsplit(as.character(min_as_of), " ")
   max_as_of = max(dydxd$as_of)
+  max_as_of_list = strsplit(as.character(max_as_of), " ")
   print(min_as_of)
   print(max_as_of)
+
+  print("assumes you're doing NO greater than 24 hours")
+  folder = min_as_of_list[[1]][1] 
+  tr = sprintf("%s-%s",min_as_of_list[[1]][2],max_as_of_list[[1]][2])
+  print(folder)
+  print(tr)
+
+  mainDir <- "."
+  subDir <- sprintf("%s/%s", "publish", folder)
+  ifelse(!dir.exists(file.path(mainDir, subDir)), dir.create(file.path(mainDir, subDir)), FALSE)
+
   caption_text = sprintf("%s %s %s", "KM GMM", min_as_of, max_as_of)
 #  caption_text = sprintf(%s %s %s, "K-Means Gaussian Mixture Model", min_as_of, max_as_of)
 
@@ -92,12 +106,12 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       )
 
 #  ggsave(sprintf("%s/%s-%s-%s-%s","clusterdb",i,dumb_hack_1,dumb_hack_2,"dydxmarkets-triple-negvdpv.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-vol-del.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-vol-del.png"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del.svg"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del.png"), width=8, height=6, dpi=300,  units="in")
 
   dfcsv <- data.frame("AsOf"=as.character(dydxdf[[3]]), "VOL"=as.numeric(dydxdf[[4]]),"DEL"=as.numeric(dydxdf[[5]]))
 
-  write.csv(dfcsv,sprintf("%s/%s-%s","publish",i,"g2d-vol-del.csv"), row.names = FALSE)
+  write.csv(dfcsv,sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del.csv"), row.names = FALSE)
 
 
   dfts <- data.frame("AsOf"=as.POSIXct(dydxdf[[3]], format="%Y-%m-%dT%H:%M:%S"), "Price"=as.numeric(dydxdf[[6]]))
@@ -128,8 +142,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       axis.title.y = element_text(color="#e3120b", size=12, face="bold")
       )
 
-  ggsave(sprintf("%s/%s-%s","publish",i,"ts.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"ts.png"), width=8, height=2, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"ts.svg"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"ts.png"), width=8, height=2, dpi=300,  units="in")
 
 
 
@@ -156,10 +170,24 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
   print(i)
 
   dydxdf <- filter(dydxd,asset_pair==i)
+
   min_as_of = min(dydxd$as_of)
+  min_as_of_list = strsplit(as.character(min_as_of), " ")
   max_as_of = max(dydxd$as_of)
+  max_as_of_list = strsplit(as.character(max_as_of), " ")
   print(min_as_of)
   print(max_as_of)
+
+  print("assumes you're doing NO greater than 24 hours")
+  folder = min_as_of_list[[1]][1] 
+  tr = sprintf("%s%s",min_as_of_list[[1]][2],max_as_of_list[[1]][2])
+  print(folder)
+  print(tr)
+
+  mainDir <- "."
+  subDir <- sprintf("%s/%s", "publish",folder)
+  ifelse(!dir.exists(file.path(mainDir, subDir)), dir.create(file.path(mainDir, subDir)), FALSE)
+
   caption_text = sprintf("%s %s %s", "KM GMM", min_as_of, max_as_of)
 #  caption_text = sprintf(%s %s %s, "K-Means Gaussian Mixture Model", min_as_of, max_as_of)
 
@@ -199,12 +227,12 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       )
 
 #  ggsave(sprintf("%s/%s-%s-%s-%s","clusterdb",i,dumb_hack_1,dumb_hack_2,"dydxmarkets-triple-negvdpv.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-vol-del-avg-up.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-vol-del-avg-up.png"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del-avg-up.svg"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del-avg-up.png"), width=8, height=6, dpi=300,  units="in")
 
   dfcsv <- data.frame("AsOf"=as.character(dydxdf[[3]]), "VOL"=as.numeric(dydxdf[[4]]),"DEL"=as.numeric(dydxdf[[5]]))
 
-  write.csv(dfcsv,sprintf("%s/%s-%s","publish",i,"g2d-vol-del-avg-up.csv"), row.names = FALSE)
+  write.csv(dfcsv,sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del-avg-up.csv"), row.names = FALSE)
 
 }
 
@@ -229,10 +257,24 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
   print(i)
 
   dydxdf <- filter(dydxd,asset_pair==i)
+
   min_as_of = min(dydxd$as_of)
+  min_as_of_list = strsplit(as.character(min_as_of), " ")
   max_as_of = max(dydxd$as_of)
+  max_as_of_list = strsplit(as.character(max_as_of), " ")
   print(min_as_of)
   print(max_as_of)
+
+  print("assumes you're doing NO greater than 24 hours")
+  folder = min_as_of_list[[1]][1] 
+  tr = sprintf("%s%s",min_as_of_list[[1]][2],max_as_of_list[[1]][2])
+  print(folder)
+  print(tr)
+
+  mainDir <- "."
+  subDir <- sprintf("%s/%s", "publish",folder)
+  ifelse(!dir.exists(file.path(mainDir, subDir)), dir.create(file.path(mainDir, subDir)), FALSE)
+
   caption_text = sprintf("%s %s %s", "KM GMM", min_as_of, max_as_of)
 #  caption_text = sprintf(%s %s %s, "K-Means Gaussian Mixture Model", min_as_of, max_as_of)
 
@@ -272,12 +314,12 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       )
 
 #  ggsave(sprintf("%s/%s-%s-%s-%s","clusterdb",i,dumb_hack_1,dumb_hack_2,"dydxmarkets-triple-negvdpv.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-vol-del-avg-down.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s-%s","publish",i,"g2d-vol-del-avg-down.png"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del-avg-down.svg"), width=8, height=6, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del-avg-down.png"), width=8, height=6, dpi=300,  units="in")
 
   dfcsv <- data.frame("AsOf"=as.character(dydxdf[[3]]), "VOL"=as.numeric(dydxdf[[4]]),"DEL"=as.numeric(dydxdf[[5]]))
 
-  write.csv(dfcsv,sprintf("%s/%s-%s","publish",i,"g2d-vol-del-avg-down.csv"), row.names = FALSE)
+  write.csv(dfcsv,sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"g2d-vol-del-avg-down.csv"), row.names = FALSE)
 
 
 
