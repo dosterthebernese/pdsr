@@ -27,9 +27,21 @@ print(con)
 print(tables)
 
 
+gtedate = "\'2022-08-01 00:00:00 +00:00\'"
+ltdate = "\'2022-08-02 00:00:00 +00:00\'"
 
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta, d.index_price FROM dydx d, dydxd dd where d.id = dd.dydx_id order by as_of'))
+qry_text = sprintf("SELECT d.asset_pair, dd.dydx_id, d.as_of, 
+  (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, 
+  dd.delta, 
+  d.index_price 
+  FROM dydx d, dydxd dd 
+  where d.id = dd.dydx_id and 
+  as_of >= %s and 
+  as_of < %s 
+  order by as_of", gtedate,ltdate)
 
+
+dydxd <- as.data.frame(dbGetQuery(con, qry_text))
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
 
@@ -124,9 +136,19 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
 }
 
+qry_text = sprintf("SELECT d.asset_pair, dd.dydx_id, d.as_of, 
+  (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, 
+  dd.delta, 
+  d.index_price 
+  FROM dydx d, dydxd dd 
+  where d.id = dd.dydx_id and 
+  dd.trailing_average < dd.trailing_halved_average and
+  as_of >= %s and 
+  as_of < %s 
+  order by as_of", gtedate,ltdate)
 
 
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta FROM dydx d, dydxd dd where d.id = dd.dydx_id and dd.trailing_average < dd.trailing_halved_average order by as_of'))
+dydxd <- as.data.frame(dbGetQuery(con, qry_text))
 
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
@@ -188,8 +210,18 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
 
 
+qry_text = sprintf("SELECT d.asset_pair, dd.dydx_id, d.as_of, 
+  (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, 
+  dd.delta, 
+  d.index_price 
+  FROM dydx d, dydxd dd 
+  where d.id = dd.dydx_id and 
+  dd.trailing_average > dd.trailing_halved_average and
+  as_of >= %s and 
+  as_of < %s 
+  order by as_of", gtedate,ltdate)
 
-dydxd <- as.data.frame(dbGetQuery(con, 'SELECT d.asset_pair, dd.dydx_id, d.as_of, (dd.trailing_standard_deviation - dd.trailing_halved_standard_deviation) / dd.trailing_standard_deviation, dd.delta, d.index_price FROM dydx d, dydxd dd where d.id = dd.dydx_id and dd.trailing_average > dd.trailing_halved_average order by as_of'))
+dydxd <- as.data.frame(dbGetQuery(con, qry_text))
 
 
 for(i in unique(dydxd$asset_pair) %>% sort) {
