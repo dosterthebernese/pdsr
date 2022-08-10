@@ -22,8 +22,3 @@ install.packages("RPostgres")
 
 install.packages("svglite")  
 
-### hack for gifs
-
-convert -delay 100 publish/*/BTC*del.png  btc-out-convert.gif  
-convert -delay 100 publish/*/ETH*del.png  eth-out-convert.gif  
-convert -delay 100 publish/*/SOL*del.png  sol-out-convert.gif  
