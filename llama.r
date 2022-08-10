@@ -36,8 +36,15 @@ print(tables)
 # gtedate = "\'2022-08-03 00:00:00 +00:00\'"
 # ltdate = "\'2022-08-04 00:00:00 +00:00\'"
 
-gtedate = "\'2022-08-04 00:00:00 +00:00\'"
-ltdate = "\'2022-08-05 00:00:00 +00:00\'"
+# gtedate = "\'2022-08-04 00:00:00 +00:00\'"
+# ltdate = "\'2022-08-05 00:00:00 +00:00\'"
+
+# gtedate = "\'2022-08-05 00:00:00 +00:00\'"
+# ltdate = "\'2022-08-06 00:00:00 +00:00\'"
+
+gtedate = "\'2022-08-06 00:00:00 +00:00\'"
+ltdate = "\'2022-08-07 00:00:00 +00:00\'"
+
 
 
 qry_text = sprintf("SELECT d.asset_pair, dd.dydx_id, d.as_of, 
@@ -101,8 +108,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
   ggplot(df, aes(x=VOL,y=DEL)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
     #You will have to work on this
-    xlim(-2.0,2.0) +
-    ylim(-2.0,2.0) +
+    xlim(-4.0,4.0) +
+    ylim(-4.0,4.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
@@ -152,7 +159,7 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
       )
 
   ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"ts.svg"), width=8, height=6, dpi=300,  units="in")
-  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"ts.png"), width=8, height=2, dpi=300,  units="in")
+  ggsave(sprintf("%s/%s/%s-%s-%s","publish",folder,i,tr,"ts.png"), width=8, height=6, dpi=300,  units="in")
 
 
 
@@ -222,8 +229,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   ggplot(df, aes(x=VOL,y=DEL)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
-    xlim(-2.0,2.0) +
-    ylim(-2.0,2.0) +
+    xlim(-4.0,4.0) +
+    ylim(-4.0,4.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
@@ -309,8 +316,8 @@ for(i in unique(dydxd$asset_pair) %>% sort) {
 
   ggplot(df, aes(x=VOL,y=DEL)) +
     geom_point(aes(color=factor(Cluster), alpha=0.3)) +
-    xlim(-2.0,2.0) +
-    ylim(-2.0,2.0) +
+    xlim(-4.0,4.0) +
+    ylim(-4.0,4.0) +
     theme_tufte() +
     guides(alpha="none") +
     scale_color_simpsons() +
